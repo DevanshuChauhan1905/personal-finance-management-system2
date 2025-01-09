@@ -13,24 +13,26 @@ public class Main {
             System.out.println("4. View Balance");
             System.out.println("5. Exit");
             System.out.print("Choose an option: ");
-
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            
+            int choice = validateMenuOption(scanner);
+            if (choice == -1) continue; // Handle invalid input gracefully
 
             switch (choice) {
                 case 1:
                     System.out.print("Enter income amount: ");
-                    double income = scanner.nextDouble();
-                    scanner.nextLine(); // Consume newline
+                    double income = validateAmount(scanner);
+                    if (income < 0) break; // Skip if invalid input
                     System.out.print("Enter income source: ");
+                    scanner.nextLine(); // Consume newline before nextLine
                     String incomeSource = scanner.nextLine();
                     financeManager.addIncome(income, incomeSource);
                     break;
                 case 2:
                     System.out.print("Enter expense amount: ");
-                    double expense = scanner.nextDouble();
-                    scanner.nextLine(); // Consume newline
+                    double expense = validateAmount(scanner);
+                    if (expense < 0) break; // Skip if invalid input
                     System.out.print("Enter expense category: ");
+                    scanner.nextLine(); // Consume newline before nextLine
                     String expenseCategory = scanner.nextLine();
                     financeManager.addExpense(expense, expenseCategory);
                     break;
@@ -47,6 +49,34 @@ public class Main {
                 default:
                     System.out.println("Invalid option. Please try again.");
             }
+        }
+    }
+
+    private static int validateMenuOption(Scanner scanner) {
+        try {
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            return choice;
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a number between 1 and 5.");
+            scanner.nextLine(); // Clear buffer
+            return -1;
+        }
+    }
+
+    private static double validateAmount(Scanner scanner) {
+        try {
+            double amount = scanner.nextDouble();
+            scanner.nextLine(); // Consume newline
+            if (amount <= 0) {
+                System.out.println("Amount must be positive.");
+                return -1;
+            }
+            return amount;
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter a numeric value.");
+            scanner.nextLine(); // Clear buffer
+            return -1;
         }
     }
 }
@@ -81,7 +111,6 @@ class FinanceManager {
             System.out.println("No transactions available.");
             return;
         }
-
         System.out.println("\n--- Transactions ---");
         for (Transaction transaction : transactions) {
             System.out.println(transaction);
